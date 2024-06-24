@@ -3,7 +3,8 @@ Starter Application Project
 
 This starter application project is meant to help get new projects off the ground quickly while focusing on modern Android architecture practices.
 The application heavily utilizes concepts from the [Now in Android](https://developer.android.com/series/now-in-android)
-app. It is a **work in progress**
+app. You can use the `package-rename-tool.bat` script to replace the package name structure with your own.
+Make note that this project template is a **work in progress**
 
 # Architecture
 

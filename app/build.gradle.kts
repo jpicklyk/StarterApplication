@@ -62,6 +62,7 @@ dependencies {
     implementation(libs.androidx.hilt.navigation.compose)
     implementation(libs.androidx.lifecycle.runtimeCompose)
     implementation(libs.androidx.navigation.compose)
+    implementation(libs.androidx.test.ext)
     //implementation(libs.androidx.profileinstaller)
     //implementation(libs.androidx.tracing.ktx)
     //implementation(libs.androidx.window.core)
@@ -76,21 +77,23 @@ dependencies {
     kspTest(libs.hilt.compiler)
 
 //    testImplementation(projects.core.dataTest)
-//    testImplementation(projects.core.testing)
+    //testImplementation(projects.core.testing)
 //    testImplementation(projects.sync.syncTest)
-    //testImplementation(libs.androidx.compose.ui.test)
+    testImplementation(libs.androidx.compose.ui.test)
     //testImplementation(libs.androidx.work.testing)
     testImplementation(libs.hilt.android.testing)
+    testImplementation(libs.androidx.test.ext)
+
 
     //testDemoImplementation(libs.robolectric)
     //testDemoImplementation(libs.roborazzi)
     //testDemoImplementation(projects.core.screenshotTesting)
 
-//    androidTestImplementation(projects.core.testing)
+    androidTestImplementation(projects.core.testing)
 //    androidTestImplementation(projects.core.dataTest)
 //    androidTestImplementation(projects.core.datastoreTest)
-//    androidTestImplementation(libs.androidx.test.espresso.core)
-//    androidTestImplementation(libs.androidx.navigation.testing)
-//    androidTestImplementation(libs.androidx.compose.ui.test)
+    androidTestImplementation(libs.androidx.test.espresso.core)
+    androidTestImplementation(libs.androidx.navigation.testing)
+    androidTestImplementation(libs.androidx.compose.ui.test)
     androidTestImplementation(libs.hilt.android.testing)
 }
