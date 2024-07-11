@@ -2,7 +2,7 @@ plugins {
     alias(libs.plugins.convention.android.application)
     alias(libs.plugins.convention.android.application.compose)
     alias(libs.plugins.convention.android.application.flavors)
-    alias(libs.plugins.convention.android.hilt)
+    alias(libs.plugins.convention.android.koin)
     //To use the firebase plugin, you will need to update the google-services.json file to include
     //your project's specific firebase configuration.
     //alias(libs.plugins.convention.android.application.firebase)
@@ -39,6 +39,7 @@ android {
             excludes.add("/META-INF/{AL2.0,LGPL2.1}")
         }
     }
+    @Suppress("UnstableApiUsage")
     testOptions {
         unitTests {
             isIncludeAndroidResources = true
@@ -47,6 +48,10 @@ android {
 }
 
 dependencies {
+    implementation(projects.core.common)
+    implementation(projects.core.knox)
+    implementation(projects.knoxStandard)
+
 
     implementation(libs.androidx.activity.compose)
     implementation(libs.androidx.compose.material3)
@@ -68,20 +73,20 @@ dependencies {
     //implementation(libs.androidx.window.core)
     //implementation(libs.kotlinx.coroutines.guava)
     //implementation(libs.coil.kt)
-
-    ksp(libs.hilt.compiler)
-
+    implementation(platform(libs.koin.bom))
+    implementation(libs.koin.android)
+    implementation(platform(libs.koin.annotations.bom))
+    implementation(libs.koin.annotations)
+    ksp(libs.koin.ksp.compiler)
     //debugImplementation(libs.androidx.compose.ui.testManifest)
     //debugImplementation(projects.uiTestHiltManifest)
 
-    kspTest(libs.hilt.compiler)
 
 //    testImplementation(projects.core.dataTest)
     //testImplementation(projects.core.testing)
 //    testImplementation(projects.sync.syncTest)
     testImplementation(libs.androidx.compose.ui.test)
     //testImplementation(libs.androidx.work.testing)
-    testImplementation(libs.hilt.android.testing)
     testImplementation(libs.androidx.test.ext)
 
 
@@ -95,5 +100,4 @@ dependencies {
     androidTestImplementation(libs.androidx.test.espresso.core)
     androidTestImplementation(libs.androidx.navigation.testing)
     androidTestImplementation(libs.androidx.compose.ui.test)
-    androidTestImplementation(libs.hilt.android.testing)
 }

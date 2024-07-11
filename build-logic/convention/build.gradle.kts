@@ -15,7 +15,6 @@
  */
 
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
     `kotlin-dsl`
@@ -77,14 +76,13 @@ gradlePlugin {
             id = "convention.android.feature"
             implementationClass = "AndroidFeatureConventionPlugin"
         }
-
         register("androidTest") {
             id = "convention.android.test"
             implementationClass = "AndroidTestConventionPlugin"
         }
-        register("androidHilt") {
-            id = "convention.android.hilt"
-            implementationClass = "AndroidHiltConventionPlugin"
+        register("androidKoin") {
+            id = "convention.android.koin"
+            implementationClass = "AndroidKoinConventionPlugin"
         }
         register("androidRoom") {
             id = "convention.android.room"
@@ -105,6 +103,10 @@ gradlePlugin {
         register("jvmLibrary") {
             id = "convention.jvm.library"
             implementationClass = "JvmLibraryConventionPlugin"
+        }
+        register("knoxLicense") {
+            id = "convention.android.knox.license"
+            implementationClass = "KnoxLicenseConventionPlugin"
         }
     }
 }

@@ -27,7 +27,7 @@ class AndroidFeatureConventionPlugin : Plugin<Project> {
         with(target) {
             pluginManager.apply {
                 apply("convention.android.library")
-                apply("convention.android.hilt")
+                apply("convention.android.koin")
             }
             extensions.configure<LibraryExtension> {
                 defaultConfig {
