@@ -1,5 +1,6 @@
 package com.example.starterapplication
 
+import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -33,53 +34,74 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
+import androidx.lifecycle.lifecycleScope
 import com.example.starterapplication.core.knox.feature.domain.model.KnoxFeature
+import com.example.starterapplication.feature.deviceadmin.domain.DeviceAdminManager
+import com.example.starterapplication.feature.deviceadmin.presentation.ui.DeviceAdminActivity
 import com.example.starterapplication.ui.theme.StarterApplicationTheme
-import dagger.hilt.android.AndroidEntryPoint
-import org.koin.androidx.compose.koinViewModel
+import kotlinx.coroutines.launch
+import org.koin.android.ext.android.inject
+import org.koin.androidx.viewmodel.ext.android.viewModel
 
-@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
+    private val deviceAdminManager: DeviceAdminManager by inject()
+    private val viewModel: MainViewModel by viewModel()
+
     @OptIn(ExperimentalMaterial3Api::class)
     override fun onCreate(savedInstanceState: Bundle?) {
+        val splashScreen = installSplashScreen()
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
-        setContent {
-            StarterApplicationTheme {
-                val viewModel: MainViewModel = koinViewModel()
-                val licenseState by viewModel.licenseState.collectAsState()
-                val uiState by viewModel.uiState.collectAsState()
+        var keepSplashScreenOn = true
+        splashScreen.setKeepOnScreenCondition { keepSplashScreenOn }
 
-                Scaffold(
-                    modifier = Modifier.fillMaxSize(),
-                    topBar = {
-                        CenterAlignedTopAppBar(
-                            title = { Text("Knox Feature Manager") },
-                            colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
-                                containerColor = MaterialTheme.colorScheme.primaryContainer,
-                                titleContentColor = MaterialTheme.colorScheme.onPrimaryContainer
+        lifecycleScope.launch {
+            if (!deviceAdminManager.isDeviceAdminActive()) {
+                keepSplashScreenOn = false
+                startActivity(Intent(this@MainActivity, DeviceAdminActivity::class.java))
+                finish()
+                return@launch
+            }
+
+            keepSplashScreenOn = false
+
+            enableEdgeToEdge()
+            setContent {
+                StarterApplicationTheme {
+                    val licenseState by viewModel.licenseState.collectAsState()
+                    val uiState by viewModel.uiState.collectAsState()
+
+                    Scaffold(
+                        modifier = Modifier.fillMaxSize(),
+                        topBar = {
+                            CenterAlignedTopAppBar(
+                                title = { Text("Knox Feature Manager") },
+                                colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
+                                    containerColor = MaterialTheme.colorScheme.primaryContainer,
+                                    titleContentColor = MaterialTheme.colorScheme.onPrimaryContainer
+                                )
                             )
-                        )
-                    }
-                ) { innerPadding ->
-                    Column(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .padding(innerPadding)
-                    ) {
-                        LicenseSection(
-                            licenseState = licenseState,
-                            onActivate = viewModel::activateLicense,
-                            onDeactivate = viewModel::deactivateLicense,
-                            onRefresh = viewModel::refreshLicenseInfo
-                        )
+                        }
+                    ) { innerPadding ->
+                        Column(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .padding(innerPadding)
+                        ) {
+                            LicenseSection(
+                                licenseState = licenseState,
+                                onActivate = viewModel::activateLicense,
+                                onDeactivate = viewModel::deactivateLicense,
+                                onRefresh = viewModel::refreshLicenseInfo
+                            )
 
-                        Spacer(modifier = Modifier.height(16.dp))
+                            Spacer(modifier = Modifier.height(16.dp))
 
-                        FeatureList(
-                            uiState = uiState,
-                            onToggleFeature = viewModel::toggleFeatureState
-                        )
+                            FeatureList(
+                                uiState = uiState,
+                                onToggleFeature = viewModel::toggleFeatureState
+                            )
+                        }
                     }
                 }
             }

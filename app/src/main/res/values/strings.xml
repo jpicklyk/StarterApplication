@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">Starter Application</string>
+    <string name="device_admin_description">Device Admin Required for Knox SDK Security Features when not using DO/PO from Android Enterprise.</string>
+
 </resources>

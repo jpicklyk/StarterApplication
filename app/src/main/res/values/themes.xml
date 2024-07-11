@@ -2,4 +2,18 @@
 <resources>
 
     <style name="Theme.StarterApplication" parent="android:Theme.Material.Light.NoActionBar" />
+
+    <!-- Splash Screen theme -->
+    <style name="Theme.StarterApplication.Starting" parent="Theme.SplashScreen">
+        <!-- Use your existing theme as the post splash screen theme -->
+        <item name="postSplashScreenTheme">@style/Theme.StarterApplication</item>
+
+        <!--
+        Optional: Set a windowSplashScreenBackground if you want a specific background color
+        <item name="windowSplashScreenBackground">@color/your_background_color</item>
+
+        Optional: Set a windowSplashScreenAnimatedIcon if you want a custom icon
+        <item name="windowSplashScreenAnimatedIcon">@drawable/your_logo</item>
+        -->
+    </style>
 </resources>
