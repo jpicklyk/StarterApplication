@@ -3,6 +3,8 @@ package com.example.starterapplication.core.knox.usecase
 import com.example.starterapplication.core.knox.api.ApiResult
 import com.example.starterapplication.core.knox.api.internals.DefaultApiError
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.currentCoroutineContext
+import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.withContext
 import org.koin.core.component.KoinComponent
 import org.koin.core.qualifier.named
@@ -21,7 +23,8 @@ interface ApiUseCase<in P, out R : Any> {
      * @param params The input parameters for the use case.
      * @return An [ApiResult] representing the result of the operation.
      */
-    suspend operator fun invoke(params: P? = null): ApiResult<R>
+    @Suppress("UNCHECKED_CAST")
+    suspend operator fun invoke(params: P = Unit as P): ApiResult<R>
 }
 
 /**
@@ -43,12 +46,14 @@ abstract class CoroutineApiUseCase<in P, out R : Any> (
      * @param params The input parameters for the use case.
      * @return An [ApiResult] representing the result of the operation.
      */
-    override suspend operator fun invoke(params: P?): ApiResult<R> = withContext(
+    final override suspend operator fun invoke(params: P): ApiResult<R> = withContext(
         dispatcher ?: defaultDispatcher
     ) {
         try {
             execute(params)
         } catch (e: Throwable) {
+            // Ensure the coroutine is active before throwing the cancellation exception
+            currentCoroutineContext().ensureActive()
             mapError(e)
         }
     }
@@ -60,7 +65,8 @@ abstract class CoroutineApiUseCase<in P, out R : Any> (
      * @param params The input parameters for the use case.
      * @return An [ApiResult] representing the result of the operation.
      */
-    protected abstract suspend fun execute(params: P?): ApiResult<R>
+    @Suppress("UNCHECKED_CAST")
+    protected abstract suspend fun execute(params: P = Unit as P): ApiResult<R>
 
     /**
      * Maps exceptions to appropriate [ApiResult.Error] instances.

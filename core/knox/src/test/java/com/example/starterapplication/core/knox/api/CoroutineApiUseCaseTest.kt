@@ -17,7 +17,7 @@ class CoroutineApiUseCaseTest : BaseCoroutineTest() {
     fun `execute returns success when no exception is thrown`() = runTest(testDispatcher) {
         // Given
         val useCase = object : CoroutineApiUseCase<Unit, String>(testDispatcher) {
-            override suspend fun execute(params: Unit?): ApiResult<String> {
+            override suspend fun execute(params: Unit): ApiResult<String> {
                 return ApiResult.Success("Test Result")
             }
         }
@@ -34,7 +34,7 @@ class CoroutineApiUseCaseTest : BaseCoroutineTest() {
     fun `execute returns error when exception is thrown`() = runTest(testDispatcher) {
         // Given
         val useCase = object : CoroutineApiUseCase<Unit, String>(testDispatcher) {
-            override suspend fun execute(params: Unit?): ApiResult<String> {
+            override suspend fun execute(params: Unit): ApiResult<String> {
                 throw RuntimeException("Test Exception")
             }
         }
@@ -51,7 +51,7 @@ class CoroutineApiUseCaseTest : BaseCoroutineTest() {
     fun `execute returns not supported for NoSuchMethodError`() = runTest(testDispatcher) {
         // Given
         val useCase = object : CoroutineApiUseCase<Unit, String>(testDispatcher) {
-            override suspend fun execute(params: Unit?): ApiResult<String> {
+            override suspend fun execute(params: Unit): ApiResult<String> {
                 throw NoSuchMethodError("Test Method Error")
             }
         }
@@ -67,7 +67,7 @@ class CoroutineApiUseCaseTest : BaseCoroutineTest() {
     fun `execute returns security error for SecurityException`() = runTest(testDispatcher) {
         // Given
         val useCase = object : CoroutineApiUseCase<Unit, String>(testDispatcher) {
-            override suspend fun execute(params: Unit?): ApiResult<String> {
+            override suspend fun execute(params: Unit): ApiResult<String> {
                 throw SecurityException("Test Security Exception")
             }
         }
@@ -88,7 +88,7 @@ class CoroutineApiUseCaseTest : BaseCoroutineTest() {
         var dispatcherUsed = false
         val testDispatcher = StandardTestDispatcher(testScheduler)
         val useCase = object : CoroutineApiUseCase<Unit, String>(testDispatcher) {
-            override suspend fun execute(params: Unit?): ApiResult<String> {
+            override suspend fun execute(params: Unit): ApiResult<String> {
                 dispatcherUsed = currentCoroutineContext()[CoroutineDispatcher] == testDispatcher
                 return ApiResult.Success("Test Result")
             }

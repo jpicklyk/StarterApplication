@@ -10,8 +10,7 @@ class AllowUsbHostStorageUseCase (
     context: Context
 ) : CoroutineApiUseCase<Boolean, Unit>() {
     private val restrictionPolicy = EnterpriseDeviceManager.getInstance(context).restrictionPolicy
-    override suspend fun execute(params: Boolean?): ApiResult<Unit> {
-        requireNotNull(params) { "params cannot be null" }
+    override suspend fun execute(params: Boolean): ApiResult<Unit> {
         val result = restrictionPolicy.allowUsbHostStorage(params)
         return if (result)
             ApiResult.Success(Unit)
