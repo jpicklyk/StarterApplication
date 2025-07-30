@@ -1,7 +1,7 @@
 Starter Application Project
 ===========================
 
-This starter application project is meant to help get new projects off the ground quickly while focusing on modern Android architecture practices.
+This starter application project is meant to help get new Samsung Knox projects off the ground quickly while focusing on modern Android architecture practices.
 The application heavily utilizes concepts from the [Now in Android](https://developer.android.com/series/now-in-android)
 app. You can use the `UpdatePackageName.ps1` PowerShell script to replace the package name structure with your own.
 Make note that this project template is a **work in progress**
