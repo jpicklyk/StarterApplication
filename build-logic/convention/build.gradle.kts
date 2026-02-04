@@ -45,6 +45,7 @@ dependencies {
     compileOnly(libs.kotlin.gradlePlugin)
     compileOnly(libs.ksp.gradlePlugin)
     compileOnly(libs.room.gradlePlugin)
+    compileOnly(libs.hilt.gradlePlugin)
     implementation(libs.truth)
 }
 
@@ -105,6 +106,10 @@ gradlePlugin {
         register("jvmLibrary") {
             id = "convention.jvm.library"
             implementationClass = "JvmLibraryConventionPlugin"
+        }
+        register("androidKnoxLicense") {
+            id = "convention.android.knox.license"
+            implementationClass = "KnoxLicenseConventionPlugin"
         }
     }
 }

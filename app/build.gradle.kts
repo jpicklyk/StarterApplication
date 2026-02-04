@@ -3,6 +3,7 @@ plugins {
     alias(libs.plugins.convention.android.application.compose)
     alias(libs.plugins.convention.android.application.flavors)
     alias(libs.plugins.convention.android.hilt)
+    alias(libs.plugins.convention.android.knox.license)
     //To use the firebase plugin, you will need to update the google-services.json file to include
     //your project's specific firebase configuration.
     //alias(libs.plugins.convention.android.application.firebase)
@@ -48,7 +49,15 @@ android {
 
 dependencies {
     implementation(projects.core.designsystem)
-    implementation(projects.core.common)
+
+    // Knox submodules
+    implementation(projects.knoxHilt)
+    implementation(projects.knoxEnterprise)
+    implementation(projects.knoxCore.android)
+    implementation(projects.knoxCore.ui)
+    implementation(projects.knoxCore.feature)
+    implementation(projects.knoxCore.usecaseExecutor)
+    implementation(projects.knoxLicensing)
     implementation(libs.androidx.activity.compose)
     implementation(libs.androidx.compose.material3)
     implementation(libs.androidx.compose.material3.adaptive)
@@ -77,11 +86,12 @@ dependencies {
 
     kspTest(libs.hilt.compiler)
 
-//    testImplementation(projects.core.dataTest)
-    //testImplementation(projects.core.testing)
-//    testImplementation(projects.sync.syncTest)
+    // Unit test dependencies
+    testImplementation(projects.knoxCore.testing)
+    testImplementation(libs.junit)
+    testImplementation(libs.bundles.mockk)
+    testImplementation(libs.kotlinx.coroutines.test)
     testImplementation(libs.androidx.compose.ui.test)
-    //testImplementation(libs.androidx.work.testing)
     testImplementation(libs.hilt.android.testing)
     testImplementation(libs.androidx.test.ext)
 
@@ -90,7 +100,7 @@ dependencies {
     //testDemoImplementation(libs.roborazzi)
     //testDemoImplementation(projects.core.screenshotTesting)
 
-    androidTestImplementation(projects.core.testing)
+    androidTestImplementation(projects.knoxCore.testing)
 //    androidTestImplementation(projects.core.dataTest)
 //    androidTestImplementation(projects.core.datastoreTest)
     androidTestImplementation(libs.androidx.test.espresso.core)
