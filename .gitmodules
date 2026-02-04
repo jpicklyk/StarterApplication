@@ -1,0 +1,12 @@
+[submodule "knox-core"]
+	path = knox-core
+	url = https://github.com/jpicklyk/knox-core.git
+[submodule "knox-enterprise"]
+	path = knox-enterprise
+	url = https://github.com/jpicklyk/knox-enterprise.git
+[submodule "knox-licensing"]
+	path = knox-licensing
+	url = https://github.com/jpicklyk/knox-licensing.git
+[submodule "knox-hilt"]
+	path = knox-hilt
+	url = https://github.com/jpicklyk/knox-hilt.git
