@@ -3,7 +3,7 @@ plugins {
     alias(libs.plugins.convention.android.application.compose)
     alias(libs.plugins.convention.android.application.flavors)
     alias(libs.plugins.convention.android.hilt)
-    alias(libs.plugins.convention.android.knox.license)
+    //alias(libs.plugins.convention.android.knox.license) // Moved to :feature:license
     //To use the firebase plugin, you will need to update the google-services.json file to include
     //your project's specific firebase configuration.
     //alias(libs.plugins.convention.android.application.firebase)
@@ -49,15 +49,14 @@ android {
 
 dependencies {
     implementation(projects.core.designsystem)
+    implementation(projects.feature.home)
+    implementation(projects.feature.license)
+    implementation(projects.feature.policies)
 
     // Knox submodules
     implementation(projects.knoxHilt)
     implementation(projects.knoxEnterprise)
     implementation(projects.knoxCore.android)
-    implementation(projects.knoxCore.ui)
-    implementation(projects.knoxCore.feature)
-    implementation(projects.knoxCore.usecaseExecutor)
-    implementation(projects.knoxLicensing)
     implementation(libs.androidx.activity.compose)
     implementation(libs.androidx.compose.material3)
     implementation(libs.androidx.compose.material3.adaptive)
@@ -87,7 +86,6 @@ dependencies {
     kspTest(libs.hilt.compiler)
 
     // Unit test dependencies
-    testImplementation(projects.knoxCore.testing)
     testImplementation(libs.junit)
     testImplementation(libs.bundles.mockk)
     testImplementation(libs.kotlinx.coroutines.test)

@@ -20,7 +20,12 @@ enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
 rootProject.name = "StarterApplication"
 include(":app")
 include(":core:designsystem")
-// Removed empty modules: :core:common, :core:testing, :feature1
+// Removed empty modules: :core:common, :core:testing
+
+// Feature modules
+include(":feature:home")
+include(":feature:license")
+include(":feature:policies")
 
 // Knox Core submodules
 include(":knox-core")
