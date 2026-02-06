@@ -64,7 +64,7 @@ dependencies {
     implementation(libs.androidx.compose.material3.adaptive.navigation)
     implementation(libs.androidx.compose.material3.adaptive.navigationSuite)
     implementation(libs.androidx.compose.material3.windowSizeClass)
-    implementation(libs.androidx.ui.tooling)
+    implementation(libs.androidx.compose.ui.tooling)
     //implementation(libs.androidx.compose.runtime.tracing)
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.core.splashscreen)
