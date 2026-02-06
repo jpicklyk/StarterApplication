@@ -20,7 +20,6 @@ enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
 rootProject.name = "StarterApplication"
 include(":app")
 include(":core:designsystem")
-// Removed empty modules: :core:common, :core:testing
 
 // Feature modules
 include(":feature:home")

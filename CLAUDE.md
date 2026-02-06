@@ -46,8 +46,6 @@ StarterApplication is a Samsung Knox Android app demonstrating enterprise policy
 ```
 app                    → Entry point: MainActivity, navigation, feature screens
 core/designsystem      → Material3 theme, color tokens, typography
-core/common            → Shared utilities
-core/testing           → Test infrastructure
 knox-core/feature      → Policy framework, annotations, registry, grouping
 knox-core/feature-processor → KSP processor for @PolicyDefinition
 knox-core/android      → AndroidApplicationContextProvider (service locator)
