@@ -4,13 +4,17 @@ Author: Jeff Picklyk (jpicklyk at gmail dot com)
 
 ## Purpose
 
-This PowerShell script automates the process of updating the package name in an Android/Kotlin
-project. It performs the following tasks:
+This PowerShell script automates the process of renaming an Android/Kotlin project. It handles
+three distinct transformations:
 
-1. Creates a backup of the project
-2. Moves files to the new package structure
-3. Updates package references in code files
-4. Removes old, empty package directories
+1. Package name (dotted):   com.example.starterapplication -> com.mycompany.myapp
+2. App display name:        Starter Application -> My App
+3. PascalCase project name: StarterApplication -> MyApp (theme names, rootProject.name, etc.)
+
+It also:
+- Creates a backup of the project before making changes
+- Moves source files to the new package directory structure
+- Removes old, empty package directories
 
 ## Prerequisites
 
@@ -28,31 +32,45 @@ project. It performs the following tasks:
    ```powershell
    .\UpdatePackageName.ps1
 
-The script will prompt you to enter the new package name.
+The script will prompt you to enter:
+- The new package name (e.g., com.mycompany.myapp)
+- The new app display name (e.g., My App)
+- Confirmation of the derived PascalCase project name (e.g., MyApp)
 
 4. To perform a dry run (see what changes would be made without actually making them):
     .\UpdatePackageName.ps1 -DryRun
 
-5. To delete the default git tracking folder
+5. To delete the default git tracking folder:
     .\UpdatePackageName.ps1 -DeleteGitFolder
 
 ## What the Script Does
 
-Creates a timestamped backup of your project
-Prompts for the new package name
-Identifies directories matching the old package structure
-Creates new directories for the new package structure
-Moves files from the old to the new package structure
-Updates package references in code files
-Removes empty directories from the old package structure
-Provides a summary of actions taken
+- Creates a timestamped backup of your project
+- Prompts for the new package name, display name, and project name
+- Identifies directories matching the old package structure
+- Creates new directories for the new package structure
+- Moves files from the old to the new package structure
+- Updates package references, display names, and project names in code files
+- Removes empty directories from the old package structure
+- Provides a summary of actions taken
+
+## Excluded Directories
+
+Knox library modules are excluded from all modifications since they have their own
+independent package identities:
+- knox-core/       (net.sfelabs.knox.core.*)
+- knox-enterprise/ (net.sfelabs.knox_enterprise)
+- knox-licensing/  (com.github.jpicklyk.knox.licensing)
+- knox-hilt/       (net.sfelabs.knox.hilt)
 
 ## Configuration
 The script uses several variables that you may need to modify based on your project structure:
 
-$currentPackageName: The current package name (default: "com.example.starterapplication")
-$fileExtensions: File types to update (default: ".kt", ".kts", ".java", ".xml", "*.conf")
-$skipFolders: Folders to ignore (default: ".gradle", ".idea", ".git", ".kotlin", "gradle", "build")
+$currentPackageName:    The current package name (default: "com.example.starterapplication")
+$currentAppDisplayName: The current display name (default: "Starter Application")
+$currentPascalCaseName: The current PascalCase name (default: "StarterApplication")
+$fileExtensions:        File types to update
+$skipFolders:           Folders to ignore (includes knox modules)
 
 Modify these variables at the top of the script if needed.
 
@@ -92,10 +110,12 @@ param (
 
 # Global variables
 $currentPackageName = "com.example.starterapplication"
+$currentAppDisplayName = "Starter Application"
+$currentPascalCaseName = "StarterApplication"
 $rootProjectFolder = Get-Location
 $logFile = "$rootProjectFolder\UpdatePackageName.log"
-$fileExtensions = @("*.kt", "*.kts", "*.java", "*.xml", "*.conf")
-$skipFolders = @(".gradle", ".idea", ".git", ".kotlin", "gradle", "build")
+$fileExtensions = @("*.kt", "*.kts", "*.java", "*.xml", "*.conf", "*.toml", "*.properties", "*.pro")
+$skipFolders = @(".gradle", ".idea", ".git", ".kotlin", "build", "knox-core", "knox-enterprise", "knox-licensing", "knox-hilt")
 
 # Statistics
 $stats = @{
@@ -130,19 +150,36 @@ function Backup-ProjectFolder {
 
 function Update-PackageNames {
     param (
-        [string]$filePath,
-        [string]$currentPackageName,
-        [string]$newPackageName
+        [string]$filePath
     )
     try {
         if (Test-Path $filePath) {
             $content = Get-Content $filePath -Raw -ErrorAction Stop
+            $modified = $false
+
+            # 1. Replace dotted package name first (most specific, case-insensitive)
             if ($content -match [regex]::Escape($currentPackageName)) {
-                $newContent = $content -replace [regex]::Escape($currentPackageName), $newPackageName
+                $content = $content -replace [regex]::Escape($currentPackageName), $newPackageName
+                $modified = $true
+            }
+
+            # 2. Replace PascalCase project name (case-sensitive to avoid matching lowercase in other contexts)
+            if ($content -cmatch [regex]::Escape($currentPascalCaseName)) {
+                $content = $content -creplace [regex]::Escape($currentPascalCaseName), $newPascalCaseName
+                $modified = $true
+            }
+
+            # 3. Replace display name (case-insensitive)
+            if ($content -match [regex]::Escape($currentAppDisplayName)) {
+                $content = $content -replace [regex]::Escape($currentAppDisplayName), $newAppDisplayName
+                $modified = $true
+            }
+
+            if ($modified) {
                 if (-not $DryRun) {
-                    Set-Content -Path $filePath -Value $newContent -ErrorAction Stop
+                    Set-Content -Path $filePath -Value $content -ErrorAction Stop
                 }
-                "Updated package names in $filePath" | Out-File -FilePath $logFile -Append
+                "Updated contents in $filePath" | Out-File -FilePath $logFile -Append
                 $stats.FilesUpdated++
             }
         }
@@ -150,7 +187,7 @@ function Update-PackageNames {
             "File not found: $filePath" | Out-File -FilePath $logFile -Append
         }
     } catch {
-        "Failed to update package names in ${filePath}: $_" | Out-File -FilePath $logFile -Append
+        "Failed to update contents in ${filePath}: $_" | Out-File -FilePath $logFile -Append
     }
 }
 
@@ -179,7 +216,7 @@ function Process-Directory {
                     }
                 } else {
                     if ($fileExtensions -contains ('*' + $item.Extension)) {
-                        Update-PackageNames -filePath $item.FullName -currentPackageName $currentPackageName -newPackageName $newPackageName
+                        Update-PackageNames -filePath $item.FullName
                     }
                 }
             }
@@ -197,8 +234,38 @@ function Process-Directory {
 
 # Prompt for new package name
 do {
-    $newPackageName = Read-Host "Enter the new package name (e.g., com.example.newapp)"
+    $newPackageName = Read-Host "Enter the new package name (e.g., com.mycompany.myapp)"
 } while ([string]::IsNullOrEmpty($newPackageName))
+
+# Prompt for new app display name
+do {
+    $newAppDisplayName = Read-Host "Enter the new app display name (e.g., My App)"
+} while ([string]::IsNullOrEmpty($newAppDisplayName))
+
+# Derive PascalCase project name from display name
+$newPascalCaseName = $newAppDisplayName -replace '\s', ''
+Write-Host "Derived project name: $newPascalCaseName"
+$override = Read-Host "Press Enter to accept or type a different project name"
+if (-not [string]::IsNullOrEmpty($override)) {
+    $newPascalCaseName = $override
+}
+
+# Show summary and confirm
+Write-Host ""
+Write-Host "Rename plan:"
+Write-Host "  Package:      $currentPackageName -> $newPackageName"
+Write-Host "  Display name: $currentAppDisplayName -> $newAppDisplayName"
+Write-Host "  Project name: $currentPascalCaseName -> $newPascalCaseName"
+Write-Host ""
+Write-Host "Excluded directories: knox-core, knox-enterprise, knox-licensing, knox-hilt"
+Write-Host ""
+if (-not $DryRun) {
+    $confirm = Read-Host "Proceed? (Y/N)"
+    if ($confirm -notin @("Y", "y", "Yes", "yes")) {
+        Write-Host "Aborted."
+        exit
+    }
+}
 
 # Create a backup of the project folder
 $backupCreated = Backup-ProjectFolder -rootProjectFolder $rootProjectFolder
@@ -301,11 +368,14 @@ if ($DeleteGitFolder) {
 $summary = @"
 Script Execution Summary:
 -------------------------
+Package:              $currentPackageName -> $newPackageName
+Display name:         $currentAppDisplayName -> $newAppDisplayName
+Project name:         $currentPascalCaseName -> $newPascalCaseName
 Directories Processed: $($stats.DirectoriesProcessed)
-Files Moved: $($stats.FilesMoved)
-Files Updated: $($stats.FilesUpdated)
-Dry Run: $($DryRun)
-.git Folder Deleted: $($DeleteGitFolder)
+Files Moved:          $($stats.FilesMoved)
+Files Updated:        $($stats.FilesUpdated)
+Dry Run:              $($DryRun)
+.git Folder Deleted:  $($DeleteGitFolder)
 "@
 
 $summary | Out-File -FilePath $logFile -Append
