@@ -38,7 +38,7 @@ internal fun Project.configureKotlinAndroid(
     commonExtension: CommonExtension,
 ) {
     commonExtension.apply {
-        compileSdk = 35
+        compileSdk = 37
 
         defaultConfig.apply {
             minSdk = 31
