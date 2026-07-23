@@ -28,10 +28,10 @@ import org.jetbrains.kotlin.compose.compiler.gradle.ComposeCompilerGradlePluginE
  * Configure Compose-specific options
  */
 internal fun Project.configureAndroidCompose(
-    commonExtension: CommonExtension<*, *, *, *, *, *>,
+    commonExtension: CommonExtension,
 ) {
     commonExtension.apply {
-        buildFeatures {
+        buildFeatures.apply {
             compose = true
         }
 
@@ -43,8 +43,8 @@ internal fun Project.configureAndroidCompose(
            // add("debugImplementation", libs.findLibrary("androidx-compose-ui-tooling").get())
         }
 
-        testOptions {
-            unitTests {
+        testOptions.apply {
+            unitTests.apply {
                 // For Robolectric
                 isIncludeAndroidResources = true
             }
@@ -65,9 +65,12 @@ internal fun Project.configureAndroidCompose(
             .relativeToRootProject("compose-reports")
             .let(reportsDestination::set)
 
-        stabilityConfigurationFile = rootProject.layout.projectDirectory.file("compose_compiler_config.conf")
-        
-        enableStrongSkippingMode = true
+        // Strong skipping mode is enabled by default since Kotlin 2.0.20; the
+        // enableStrongSkippingMode property was removed from the Compose compiler
+        // Gradle plugin extension.
+        stabilityConfigurationFiles.add(
+            rootProject.layout.projectDirectory.file("compose_compiler_config.conf")
+        )
     }
      
 }

@@ -28,13 +28,13 @@ class KnoxLicenseConventionPlugin : Plugin<Project> {
     }
 
     private fun Project.configureBuildConfig(
-        extension: CommonExtension<*, *, *, *, *, *>
+        extension: CommonExtension
     ) {
         extension.apply {
-            buildFeatures {
+            buildFeatures.apply {
                 buildConfig = true
             }
-            defaultConfig {
+            defaultConfig.apply {
                 buildConfigField(
                     type = "String",
                     name = "KNOX_LICENSE_KEY",

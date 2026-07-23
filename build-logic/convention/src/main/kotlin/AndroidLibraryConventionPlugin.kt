@@ -14,8 +14,8 @@
  *   limitations under the License.
  */
 
+import com.android.build.api.dsl.LibraryExtension
 import com.android.build.api.variant.LibraryAndroidComponentsExtension
-import com.android.build.gradle.LibraryExtension
 import internals.configureFlavors
 import internals.configureGradleManagedDevices
 import internals.configureKotlinAndroid
@@ -33,13 +33,14 @@ class AndroidLibraryConventionPlugin : Plugin<Project> {
         with(target) {
             with(pluginManager) {
                 apply("com.android.library")
-                apply("org.jetbrains.kotlin.android")
                 apply("convention.android.lint")
             }
 
             extensions.configure<LibraryExtension> {
                 configureKotlinAndroid(this)
-                defaultConfig.targetSdk = 34
+                // targetSdk was removed from library defaultConfig in AGP 9;
+                // it only affects instrumented tests for libraries.
+                testOptions.targetSdk = 34
                 testOptions.animationsDisabled = true
                 configureFlavors(this)
                 configureGradleManagedDevices(this)

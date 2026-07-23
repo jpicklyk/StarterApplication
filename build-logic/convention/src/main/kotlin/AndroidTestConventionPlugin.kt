@@ -14,7 +14,7 @@
  *   limitations under the License.
  */
 
-import com.android.build.gradle.TestExtension
+import com.android.build.api.dsl.TestExtension
 import internals.configureGradleManagedDevices
 import internals.configureKotlinAndroid
 import org.gradle.api.Plugin
@@ -26,7 +26,6 @@ class AndroidTestConventionPlugin : Plugin<Project> {
         with(target) {
             with(pluginManager) {
                 apply("com.android.test")
-                apply("org.jetbrains.kotlin.android")
             }
 
             extensions.configure<TestExtension> {

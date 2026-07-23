@@ -1,8 +1,8 @@
 package internals
 
 import com.android.build.api.dsl.ApplicationExtension
-import com.android.build.api.dsl.ApplicationProductFlavor
 import com.android.build.api.dsl.CommonExtension
+import com.android.build.api.dsl.LibraryExtension
 import com.android.build.api.dsl.ProductFlavor
 
 @Suppress("EnumEntryName")
@@ -20,21 +20,30 @@ enum class AppFlavor(val dimension: FlavorDimension, val applicationIdSuffix: St
 }
 
 fun configureFlavors(
-    commonExtension: CommonExtension<*, *, *, *, *, *>,
+    commonExtension: CommonExtension,
     flavorConfigurationBlock: ProductFlavor.(flavor: AppFlavor) -> Unit = {}
 ) {
-    commonExtension.apply {
-        flavorDimensions += FlavorDimension.contentType.name
-        productFlavors {
-            AppFlavor.values().forEach {
-                create(it.name) {
-                    dimension = it.dimension.name
-                    flavorConfigurationBlock(this, it)
-                    if (this@apply is ApplicationExtension && this is ApplicationProductFlavor) {
-                        if (it.applicationIdSuffix != null) {
-                            applicationIdSuffix = it.applicationIdSuffix
-                        }
+    commonExtension.flavorDimensions += FlavorDimension.contentType.name
+
+    // productFlavors is only exposed on the typed extensions since AGP 9
+    when (commonExtension) {
+        is ApplicationExtension -> commonExtension.productFlavors {
+            AppFlavor.values().forEach { flavor ->
+                create(flavor.name) {
+                    dimension = flavor.dimension.name
+                    flavorConfigurationBlock(this, flavor)
+                    if (flavor.applicationIdSuffix != null) {
+                        applicationIdSuffix = flavor.applicationIdSuffix
                     }
+                }
+            }
+        }
+
+        is LibraryExtension -> commonExtension.productFlavors {
+            AppFlavor.values().forEach { flavor ->
+                create(flavor.name) {
+                    dimension = flavor.dimension.name
+                    flavorConfigurationBlock(this, flavor)
                 }
             }
         }

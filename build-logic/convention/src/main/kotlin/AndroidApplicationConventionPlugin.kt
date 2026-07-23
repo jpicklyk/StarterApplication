@@ -16,7 +16,6 @@
 
 import com.android.build.api.dsl.ApplicationExtension
 import com.android.build.api.variant.ApplicationAndroidComponentsExtension
-import com.android.build.gradle.BaseExtension
 import internals.configureBadgingTasks
 import internals.configureGradleManagedDevices
 import internals.configureKotlinAndroid
@@ -31,7 +30,6 @@ class AndroidApplicationConventionPlugin : Plugin<Project> {
         with(target) {
             with(pluginManager) {
                 apply("com.android.application")
-                apply("org.jetbrains.kotlin.android")
                 apply("convention.android.lint")
                 //apply("com.dropbox.dependency-guard")
             }
@@ -45,7 +43,7 @@ class AndroidApplicationConventionPlugin : Plugin<Project> {
             }
             extensions.configure<ApplicationAndroidComponentsExtension> {
                 configurePrintApksTask(this)
-                configureBadgingTasks(extensions.getByType<BaseExtension>(), this)
+                configureBadgingTasks(extensions.getByType<ApplicationExtension>(), this)
             }
         }
     }

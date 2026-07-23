@@ -25,7 +25,7 @@ import org.gradle.kotlin.dsl.invoke
  * Configure project for Gradle managed devices
  */
 internal fun configureGradleManagedDevices(
-    commonExtension: CommonExtension<*, *, *, *, *, *>,
+    commonExtension: CommonExtension,
 ) {
     val pixel4 = DeviceConfig("Pixel 4", 30, "aosp-atd")
     val pixel6 = DeviceConfig("Pixel 6", 31, "aosp")
@@ -34,22 +34,18 @@ internal fun configureGradleManagedDevices(
     val allDevices = listOf(pixel4, pixel6, pixelC)
     val ciDevices = listOf(pixel4, pixelC)
 
-    commonExtension.testOptions {
-        managedDevices {
-            devices {
-                allDevices.forEach { deviceConfig ->
-                    maybeCreate(deviceConfig.taskName, ManagedVirtualDevice::class.java).apply {
-                        device = deviceConfig.device
-                        apiLevel = deviceConfig.apiLevel
-                        systemImageSource = deviceConfig.systemImageSource
-                    }
+    commonExtension.testOptions.apply {
+        managedDevices.apply {
+            allDevices.forEach { deviceConfig ->
+                localDevices.maybeCreate(deviceConfig.taskName).apply {
+                    device = deviceConfig.device
+                    apiLevel = deviceConfig.apiLevel
+                    systemImageSource = deviceConfig.systemImageSource
                 }
             }
-            groups {
-                maybeCreate("ci").apply {
-                    ciDevices.forEach { deviceConfig ->
-                        targetDevices.add(devices[deviceConfig.taskName])
-                    }
+            groups.maybeCreate("ci").apply {
+                ciDevices.forEach { deviceConfig ->
+                    targetDevices.add(localDevices[deviceConfig.taskName])
                 }
             }
         }

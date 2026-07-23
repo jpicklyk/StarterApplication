@@ -20,10 +20,12 @@ import com.android.build.api.dsl.CommonExtension
 import org.gradle.api.JavaVersion
 import org.gradle.api.Project
 import org.gradle.api.plugins.JavaPluginExtension
+import org.gradle.api.tasks.testing.Test
 import org.gradle.kotlin.dsl.assign
 import org.gradle.kotlin.dsl.configure
 import org.gradle.kotlin.dsl.dependencies
 import org.gradle.kotlin.dsl.provideDelegate
+import org.gradle.kotlin.dsl.withType
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.dsl.KotlinAndroidProjectExtension
 import org.jetbrains.kotlin.gradle.dsl.KotlinJvmProjectExtension
@@ -33,16 +35,16 @@ import org.jetbrains.kotlin.gradle.dsl.KotlinBaseExtension
  * Configure base Kotlin with Android options
  */
 internal fun Project.configureKotlinAndroid(
-    commonExtension: CommonExtension<*, *, *, *, *, *>,
+    commonExtension: CommonExtension,
 ) {
     commonExtension.apply {
         compileSdk = 35
 
-        defaultConfig {
+        defaultConfig.apply {
             minSdk = 31
         }
 
-        compileOptions {
+        compileOptions.apply {
             // Up to Java 11 APIs are available through desugaring
             // https://developer.android.com/studio/write/java11-minimal-support-table
             sourceCompatibility = JavaVersion.VERSION_11
@@ -53,8 +55,21 @@ internal fun Project.configureKotlinAndroid(
 
     configureKotlin<KotlinAndroidProjectExtension>()
 
+    allowEmptyTestSuites()
+
     dependencies {
         add("coreLibraryDesugaring", libs.findLibrary("android.desugarJdkLibs").get())
+    }
+}
+
+/**
+ * Gradle 9 fails test tasks that discover no tests. Modules without unit tests still
+ * produce candidate classes (e.g. Hilt-generated test components), so restore the
+ * pre-Gradle-9 behavior of treating an empty suite as a pass.
+ */
+internal fun Project.allowEmptyTestSuites() {
+    tasks.withType<Test>().configureEach {
+        failOnNoDiscoveredTests = false
     }
 }
 
@@ -70,6 +85,8 @@ internal fun Project.configureKotlinJvm() {
     }
 
     configureKotlin<KotlinJvmProjectExtension>()
+
+    allowEmptyTestSuites()
 }
 
 /**
